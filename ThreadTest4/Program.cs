@@ -10,9 +10,11 @@
     {
         static void Main()
         {
-            bool stopThread  = false;
 
             int[] partialSums = new int[3];
+
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+            CancellationToken token = cancellationTokenSource.Token;
 
             Thread t1 = new Thread(() =>
             {
@@ -29,7 +31,7 @@
                 int s = 0;
                 for (int i = 1000; i < 2000; i++)
                 {
-                    if(stopThread)
+                    if(token.IsCancellationRequested)
                     {
                         break;
                     }
@@ -57,11 +59,14 @@
             //    || t2.ThreadState == ThreadState.Running
             //    || t3.ThreadState == ThreadState.Running) ;
 
-            stopThread = true;
+            cancellationTokenSource.Cancel();
 
             t1.Join();
             t2.Join();
             t3.Join();
+
+
+
 
             Console.WriteLine(partialSums.Sum());
         }
